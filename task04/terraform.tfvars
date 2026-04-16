@@ -18,6 +18,7 @@ allow_http_rule_name = "AllowHTTP"
 
 vm_name = "cmaz-z5t7jrzx-mod4-vm"
 
+ip_configuration_name = "internal"
 
 domain_name_label = "cmaz-z5t7jrzx-mod4-nginx"
 

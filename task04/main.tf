@@ -109,7 +109,7 @@ resource "azurerm_network_interface" "nic" {
 
   ip_configuration {
 
-    name = "internal"
+    name = var.ip_configuration_name
 
     subnet_id = azurerm_subnet.subnet.id
 

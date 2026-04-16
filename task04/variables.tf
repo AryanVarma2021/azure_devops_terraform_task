@@ -63,3 +63,7 @@ variable "domain_name_label" {
   type        = string
 
 }
+variable "ip_configuration_name" {
+  description = "NIC IP configuration name"
+  type        = string
+}
