@@ -38,6 +38,8 @@ resource "azurerm_public_ip" "public_ip" {
   location            = var.default_location
   resource_group_name = azurerm_resource_group.rg.name
 
+  sku = "Standard"
+
   allocation_method = "Static"
 
   domain_name_label = var.domain_name_label
