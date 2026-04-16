@@ -40,7 +40,7 @@ resource "azurerm_public_ip" "public_ip" {
 
   allocation_method = "Static"
 
-  domain_name_label = "cmaz-z5t7jrzx-mod4-nginx"
+  domain_name_label = var.domain_name_label
 
   tags = var.tags
 }
@@ -136,13 +136,13 @@ resource "azurerm_network_interface_security_group_association" "nsg_assoc" {
 
 resource "azurerm_linux_virtual_machine" "vm" {
 
-  name                = "cmaz-z5t7jrzx-mod4-vm"
+  name                = var.vm_name
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.default_location
 
   size = "Standard_B2s_v2"
 
-  computer_name = "mod4vm"
+  computer_name = var.vm_name
 
   admin_username = "azureuser"
 

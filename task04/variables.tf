@@ -27,6 +27,11 @@ variable "public_ip_address_name" {
   description = "Public IP address name"
   type        = string
 }
+variable "vm_name" {
+  description = "Virtual machine name"
+  type        = string
+
+}
 
 variable "nsg_name" {
   description = "Network security group name"
@@ -42,4 +47,10 @@ variable "vm_password" {
 variable "tags" {
   description = "Common tags for resources"
   type        = map(string)
+}
+
+variable "domain_name_label" {
+  description = "Domain name label for the public IP address"
+  type        = string
+
 }
