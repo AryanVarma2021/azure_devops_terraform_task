@@ -12,6 +12,10 @@ public_ip_address_name = "cmaz-z5t7jrzx-mod4-pip"
 
 nsg_name = "cmaz-z5t7jrzx-mod4-nsg"
 
+allow_ssh_rule_name = "AllowSSH"
+
+allow_http_rule_name = "AllowHTTP"
+
 vm_name = "cmaz-z5t7jrzx-mod4-vm"
 
 

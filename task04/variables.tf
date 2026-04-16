@@ -32,6 +32,15 @@ variable "vm_name" {
   type        = string
 
 }
+variable "allow_ssh_rule_name" {
+  description = "NSG rule name for SSH"
+  type        = string
+}
+
+variable "allow_http_rule_name" {
+  description = "NSG rule name for HTTP"
+  type        = string
+}
 
 variable "nsg_name" {
   description = "Network security group name"
