@@ -1,176 +1,212 @@
-# ===========Resource Group====================
+# ================= Resource Group =================
+
 resource "azurerm_resource_group" "rg" {
-  name = var.rg-name
-  location = var.default-location
+  name     = var.rg_name
+  location = var.default_location
 
   tags = var.tags
-
-  
 }
 
 
+# ================= Virtual Network =================
 
-# ===========Virtual Network and Subnet====================
 resource "azurerm_virtual_network" "vnet" {
-  name                = var.vnet-name
+  name                = var.vnet_name
   address_space       = ["10.0.0.0/16"]
-  location            = var.default-location
+  location            = var.default_location
   resource_group_name = azurerm_resource_group.rg.name
 
   tags = var.tags
-
 }
+
+
+# ================= Subnet =================
 
 resource "azurerm_subnet" "subnet" {
-  name                 = var.subnet-name
+  name                 = var.subnet_name
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.1.0/24"]
 
-  
+  address_prefixes = ["10.0.1.0/24"]
 }
 
 
+# ================= Public IP =================
 
+resource "azurerm_public_ip" "public_ip" {
+  name                = var.public_ip_address_name
+  location            = var.default_location
+  resource_group_name = azurerm_resource_group.rg.name
 
+  allocation_method = "Static"
 
-# ===================Public IP, Network Interface, and Network Security Group====================
-resource "azurerm_public_ip" "public-ip-address" {
-    name                = "cmaz-z5t7jrzx-mod4-pip"
-    location            = var.default-location
-    resource_group_name = azurerm_resource_group.rg.name
-    allocation_method   = "Static"
-    domain_name_label  = "cmaz-z5t7jrzx-mod4-nginx"
+  domain_name_label = "cmaz-z5t7jrzx-mod4-nginx"
 
-    tags = var.tags
-  
+  tags = var.tags
 }
 
-resource "azurerm_network_interface" "nic-name" {
-    name                = var.network-interface-name
-    location            = var.default-location
-    resource_group_name = azurerm_resource_group.rg.name
-    
-    ip_configuration {
-        name                          = "internal"
-        subnet_id                     = azurerm_subnet.subnet.id
-        private_ip_address_allocation = "Dynamic"
-        public_ip_address_id = azurerm_public_ip.public-ip-address.id
-        
-    }
 
-    tags = var.tags
-  
-}
+# ================= Network Security Group =================
 
 resource "azurerm_network_security_group" "nsg" {
-    name                = var.nsg-name
-    location            = var.default-location
-    resource_group_name = azurerm_resource_group.rg.name
-
-    tags = var.tags
-  
-}
-
-resource "azurerm_network_security_rule" "allow-ssh" {
+  name                = var.nsg_name
+  location            = var.default_location
   resource_group_name = azurerm_resource_group.rg.name
+
+  tags = var.tags
+}
+
+
+# allow SSH
+
+resource "azurerm_network_security_rule" "allow_ssh" {
+
+  name                        = "AllowSSH"
+  priority                    = 1001
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+
+  source_port_range      = "*"
+  destination_port_range = "22"
+
+  source_address_prefix      = "*"
+  destination_address_prefix = "*"
+
+  resource_group_name         = azurerm_resource_group.rg.name
   network_security_group_name = azurerm_network_security_group.nsg.name
-
-
-    name                        = "Allow-SSH"
-    priority                    = 1001
-    direction                   = "Inbound"
-    access                      = "Allow"
-    protocol                    = "Tcp"
-    source_port_range           = "*"
-    destination_port_range      = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-    
-  
-}
-
-resource "azurerm_network_security_rule" "allow-http" {
-    resource_group_name = azurerm_resource_group.rg.name
-    network_security_group_name = azurerm_network_security_group.nsg.name
-    
-        name                        = "Allow-HTTP"
-        priority                    = 1002
-        direction                   = "Inbound"
-        access                      = "Allow"
-        protocol                    = "Tcp"
-        source_port_range           = "*"
-        destination_port_range      = "80"
-        source_address_prefix      = "*"
-        destination_address_prefix = "*"
-    
-   
-  
 }
 
 
+# allow HTTP
+
+resource "azurerm_network_security_rule" "allow_http" {
+
+  name                        = "AllowHTTP"
+  priority                    = 1002
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+
+  source_port_range      = "*"
+  destination_port_range = "80"
+
+  source_address_prefix      = "*"
+  destination_address_prefix = "*"
+
+  resource_group_name         = azurerm_resource_group.rg.name
+  network_security_group_name = azurerm_network_security_group.nsg.name
+}
 
 
+# ================= Network Interface =================
+
+resource "azurerm_network_interface" "nic" {
+
+  name                = var.network_interface_name
+  location            = var.default_location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+
+    name = "internal"
+
+    subnet_id = azurerm_subnet.subnet.id
+
+    private_ip_address_allocation = "Dynamic"
+
+    public_ip_address_id = azurerm_public_ip.public_ip.id
+  }
+
+  tags = var.tags
+}
 
 
+# ================= NSG association =================
+
+resource "azurerm_network_interface_security_group_association" "nsg_assoc" {
+
+  network_interface_id      = azurerm_network_interface.nic.id
+
+  network_security_group_id = azurerm_network_security_group.nsg.id
+}
 
 
+# ================= Virtual Machine =================
 
-resource "azurerm_linux_virtual_machine" "vm_linux" {
+resource "azurerm_linux_virtual_machine" "vm" {
 
   name                = "cmaz-z5t7jrzx-mod4-vm"
   resource_group_name = azurerm_resource_group.rg.name
-  location            = var.default-location
+  location            = var.default_location
 
-  size           = "Standard_B2s_v2"
-  computer_name  = "mod4vm"
+  size = "Standard_B2s_v2"
+
+  computer_name = "mod4vm"
 
   admin_username = "azureuser"
+
   admin_password = var.vm_password
 
+
   network_interface_ids = [
-    azurerm_network_interface.nic_name.id
+
+    azurerm_network_interface.nic.id
+
   ]
 
+
   os_disk {
-    caching              = "ReadWrite"
+
+    caching = "ReadWrite"
+
     storage_account_type = "Standard_LRS"
   }
 
+
   source_image_reference {
+
     publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "24_04-lts"
-    version   = "latest"
+
+    offer = "0001-com-ubuntu-server-jammy"
+
+    sku = "24_04-lts"
+
+    version = "latest"
   }
 
+
   provisioner "remote-exec" {
+
     inline = [
-      "sudo apt update",
-      "sudo apt install nginx -y",
-      "sudo systemctl start nginx",
-      "sudo systemctl enable nginx"
+
+      "sudo apt-get update -y",
+
+      "sudo apt-get install -y nginx",
+
+      "sudo systemctl enable nginx",
+
+      "sudo systemctl start nginx"
+
     ]
 
+
     connection {
-      type        = "ssh"
-      host        = azurerm_public_ip.public-ip-address.ip_address
-      user        = "azureuser"
-      password    = var.vm_password
+
+      type = "ssh"
+
+      host = azurerm_public_ip.public_ip.ip_address
+
+      user = "azureuser"
+
+      password = var.vm_password
+
       port = 22
 
       timeout = "10m"
     }
-    
   }
 
-  
 
   tags = var.tags
 }
-
-
-
-
-
-

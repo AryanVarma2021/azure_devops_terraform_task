@@ -1,51 +1,45 @@
-variable "rg-name" {
-
-    default = "cmaz-z5t7jrzx-mod4-rg"
-    description = "Resource group name"
-  
+variable "rg_name" {
+  description = "Resource group name"
+  type        = string
 }
 
-variable "default-location" {
-    default = "eastus"
-    description = "Default location for resources"
-  
+variable "default_location" {
+  description = "Default location for resources"
+  type        = string
 }
 
-variable "vnet-name" {
-    default = "cmaz-z5t7jrzx-mod4-vnet"
-    description = "Virtual network name"
+variable "vnet_name" {
+  description = "Virtual network name"
+  type        = string
 }
 
-variable "subnet-name" {
-    default = "frontend"
-    description = "Subnet name"
+variable "subnet_name" {
+  description = "Subnet name"
+  type        = string
 }
 
-variable "network-interface-name" {
-    default = "cmaz-z5t7jrzx-mod4-nic"
-    description = "Network interface name"
-  
+variable "network_interface_name" {
+  description = "Network interface name"
+  type        = string
 }
 
-variable "public-ip-address-name" {
-    default = "cmaz-z5t7jrzx-mod4-pip"
-    description = "Public IP address name"
-  
+variable "public_ip_address_name" {
+  description = "Public IP address name"
+  type        = string
 }
-variable "nsg-name" {
-    default = "cmaz-z5t7jrzx-mod4-nsg"
-    description = "Network security group name"
-  
+
+variable "nsg_name" {
+  description = "Network security group name"
+  type        = string
 }
+
 variable "vm_password" {
-    
-    default = "P@ssw0rd1234!"
-    description = "Password for the virtual machine"
+  description = "Password for the virtual machine"
+  type        = string
+  sensitive   = true
 }
+
 variable "tags" {
-    default =  {
-        Creator = "aryan_pramodkumarvarma@epam.com"
-        
-    }
-  
+  description = "Common tags for resources"
+  type        = map(string)
 }
